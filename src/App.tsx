@@ -3,22 +3,19 @@ import {
   createClient,
   defaultChains,
   configureChains,
-} from "wagmi";
+} from 'wagmi';
 
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
+import { publicProvider } from 'wagmi/providers/public';
+import { infuraProvider } from 'wagmi/providers/infura';
 
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { InjectedConnector } from 'wagmi/connectors/injected';
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 
-import { Profile } from "./components/Profile";
+import Profile from './components/Profile';
 
-// Configure chains & providers with the Alchemy provider.
-// Two popular providers are Alchemy (alchemy.com) and Infura (infura.io)
+// Configure chains & providers with the Infura provider
 const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
-  alchemyProvider({ apiKey: "yourAlchemyApiKey" }),
+  infuraProvider({ apiKey: process.env.REACT_APP_INFURA_API_KEY || '' }),
   publicProvider(),
 ]);
 
@@ -27,22 +24,10 @@ const client = createClient({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({ chains }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: "wagmi",
-      },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        qrcode: true,
-      },
-    }),
     new InjectedConnector({
       chains,
       options: {
-        name: "Injected",
+        name: 'Injected',
         shimDisconnect: true,
       },
     }),
