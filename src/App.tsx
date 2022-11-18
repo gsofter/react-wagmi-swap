@@ -12,6 +12,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 
 import Profile from './components/Profile';
+import MainLayout from './layouts/MainLayout';
 
 // Configure chains & providers with the Infura provider
 const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
@@ -40,7 +41,9 @@ const client = createClient({
 export default function App() {
   return (
     <WagmiConfig client={client}>
-      <Profile />
+      <MainLayout>
+        <Profile />
+      </MainLayout>
     </WagmiConfig>
   );
 }
