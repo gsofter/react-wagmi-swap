@@ -14,6 +14,7 @@ import { ConnectKitProvider } from 'connectkit';
 
 import Profile from './components/Profile';
 import MainLayout from './layouts/MainLayout';
+import AppContextProvider from './context/AppContextProvider';
 
 // Configure chains & providers with the Infura provider
 const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
@@ -43,9 +44,11 @@ export default function App() {
   return (
     <WagmiConfig client={client}>
       <ConnectKitProvider>
-        <MainLayout>
-          <Profile />
-        </MainLayout>
+        <AppContextProvider>
+          <MainLayout>
+            <Profile />
+          </MainLayout>
+        </AppContextProvider>
       </ConnectKitProvider>
     </WagmiConfig>
   );
