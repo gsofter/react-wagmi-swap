@@ -1,4 +1,8 @@
 import {
+  BrowserRouter, Routes, Route, Navigate,
+} from 'react-router-dom';
+
+import {
   WagmiConfig,
   createClient,
   defaultChains,
@@ -12,9 +16,10 @@ import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { ConnectKitProvider } from 'connectkit';
 
-import Profile from './components/Profile';
 import MainLayout from './layouts/MainLayout';
 import AppContextProvider from './context/AppContextProvider';
+import PageNotFound from './components/PageNotFound';
+import SwapCard from './components/swap/Swap';
 
 // Configure chains & providers with the Infura provider
 const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
@@ -42,14 +47,20 @@ const client = createClient({
 // Pass client to React Context Provider
 export default function App() {
   return (
-    <WagmiConfig client={client}>
-      <ConnectKitProvider>
-        <AppContextProvider>
-          <MainLayout>
-            <Profile />
-          </MainLayout>
-        </AppContextProvider>
-      </ConnectKitProvider>
-    </WagmiConfig>
+    <BrowserRouter>
+      <WagmiConfig client={client}>
+        <ConnectKitProvider>
+          <AppContextProvider>
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<Navigate to="/swap" />} />
+                <Route path="/swap" element={<SwapCard />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </MainLayout>
+          </AppContextProvider>
+        </ConnectKitProvider>
+      </WagmiConfig>
+    </BrowserRouter>
   );
 }
