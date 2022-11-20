@@ -3,20 +3,12 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Tooltip from '@mui/material/Tooltip';
 import SwapCallsIcon from '@mui/icons-material/SwapCalls';
-import WalletConnectDialog from './dialogs/WalletConnectDialog';
+import { ConnectKitButton } from 'connectkit';
 
 function Header() {
-  const [openWalletConnectDlg, setOpenWalletConnectDlg] = React.useState(false);
-  const handleClickConnectWallet = () => {
-    console.log('handleClickConnectWallet');
-    // show wallet connect modal
-    setOpenWalletConnectDlg(true);
-  };
-
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -64,13 +56,11 @@ function Header() {
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
-              <Button variant="contained" onClick={handleClickConnectWallet}>Connect Wallet</Button>
+              <ConnectKitButton />
             </Tooltip>
           </Box>
         </Toolbar>
       </Container>
-
-      <WalletConnectDialog open={openWalletConnectDlg} setOpen={setOpenWalletConnectDlg} />
     </AppBar>
   );
 }

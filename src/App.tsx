@@ -10,6 +10,7 @@ import { infuraProvider } from 'wagmi/providers/infura';
 
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
+import { ConnectKitProvider } from 'connectkit';
 
 import Profile from './components/Profile';
 import MainLayout from './layouts/MainLayout';
@@ -41,9 +42,11 @@ const client = createClient({
 export default function App() {
   return (
     <WagmiConfig client={client}>
-      <MainLayout>
-        <Profile />
-      </MainLayout>
+      <ConnectKitProvider>
+        <MainLayout>
+          <Profile />
+        </MainLayout>
+      </ConnectKitProvider>
     </WagmiConfig>
   );
 }
