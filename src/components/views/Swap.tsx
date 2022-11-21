@@ -4,20 +4,35 @@ import {
   Paper, Container, Typography, Button,
 } from '@mui/material';
 import axios from 'axios';
-import TokenInput from './TokenInput';
+import { useNetwork } from 'wagmi';
+import TokenInput from '../swap/TokenInput';
 import TokenSelectionDialog from '../dialogs/TokenSelectionDialog';
 import { UNI_LIST } from '../../constants';
 import useAppContext from '../../lib/hooks/useAppContext';
+import { getNativeToken } from '../../lib/utils/getNativeToken';
+import { TokenType } from '../../types';
 
 const SwapCard: React.FC = () => {
   const { setTokens } = useAppContext();
-  const fetchTokens = async () => {
+  const { chain } = useNetwork();
+  const initializeTokens = async () => {
     const response = await axios.get(UNI_LIST);
-    setTokens(response.data.tokens);
+
+    const chainId = chain?.id || 1;
+
+    const tokens = response.data.tokens.filter((token: TokenType) => token.chainId === chainId)
+      .map((token: TokenType) => ({
+        ...token,
+        native: false,
+      }));
+
+    // add native token to first
+    tokens.unshift(getNativeToken(chainId));
+    setTokens(tokens);
   };
 
   useEffect(() => {
-    fetchTokens();
+    initializeTokens();
   }, []);
 
   return (
@@ -30,7 +45,6 @@ const SwapCard: React.FC = () => {
         <TokenInput position="to" />
         <Button variant="contained" sx={{ width: '100%', mt: 2 }}>Swap</Button>
       </Paper>
-
       <TokenSelectionDialog />
     </Container>
   );

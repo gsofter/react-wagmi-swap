@@ -18,8 +18,8 @@ import { ConnectKitProvider } from 'connectkit';
 
 import MainLayout from './layouts/MainLayout';
 import AppContextProvider from './context/AppContextProvider';
-import PageNotFound from './components/PageNotFound';
-import SwapCard from './components/swap/Swap';
+import PageNotFound from './components/views/PageNotFound';
+import SwapCard from './components/views/Swap';
 
 // Configure chains & providers with the Infura provider
 const { chains, provider, webSocketProvider } = configureChains(defaultChains, [

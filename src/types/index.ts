@@ -5,6 +5,7 @@ export type TokenType = {
   'decimals': number
   'logoURI': string,
   'address': string,
+  native?: boolean,
 };
 
 export type SupportedChainIds = [1, 5];

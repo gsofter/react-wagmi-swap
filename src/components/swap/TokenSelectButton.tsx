@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button } from '@mui/material';
+import { Button, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TokenType } from '../../types';
 import uriToHttp from '../../lib/utils/uriToHttp';
@@ -12,7 +12,7 @@ interface ITokenSelectButtonProps {
 }
 
 const TokenAvatar = ({ token }: { token: TokenType }) => (
-  <img
+  <Avatar
     src={uriToHttp(token.logoURI)[0]}
     alt={token.symbol}
     style={{
@@ -48,7 +48,7 @@ const TokenSelectButton: React.FC<ITokenSelectButtonProps> = ({
     <Button
       variant="contained"
       sx={{
-        width: 'auto', maxWidth: '100px', borderRadius: '50px',
+        width: 'auto', maxWidth: 'auto', borderRadius: '50px',
       }}
       startIcon={<TokenAvatar token={token} />}
       endIcon={<KeyboardArrowDownIcon />}

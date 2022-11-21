@@ -12,12 +12,12 @@ import uriToHttp from '../../lib/utils/uriToHttp';
 
 const TokenSelectionDialog: React.FC = () => {
   const {
-    tokenSelectionDialog, closeTokenSelectionDialog, tokens, setFromToken, setToToken, fromToken,
+    tokenSelectionDialog, closeTokenSelectionDialog, tokens, setFromToken, setToToken, fromToken, toToken,
   } = useAppContext();
   const { open } = tokenSelectionDialog;
   const { chain } = useNetwork();
 
-  const tokensForChain = useMemo(() => tokens.filter((t) => t.chainId === chain?.id) || [], [tokens, chain]);
+  const tokensForChain = useMemo(() => tokens.filter((t) => t.chainId === (chain?.id || 1)) || [], [tokens, chain]);
 
   const onClickTokenItem = (token: TokenType) => {
     if (tokenSelectionDialog.position === 'from') {
@@ -28,24 +28,36 @@ const TokenSelectionDialog: React.FC = () => {
     closeTokenSelectionDialog();
   };
 
+  const isTokenSelected = (token: TokenType) => {
+    if (tokenSelectionDialog.position === 'from') {
+      return fromToken?.address === token.address;
+    }
+    if (tokenSelectionDialog.position === 'to') {
+      return toToken?.address === token.address;
+    }
+    return false;
+  };
+
   const renderDlgContent = () => (
     <Box>
-      {tokensForChain.map((t) => (
-        <List component="nav" aria-label="main mailbox folders" key={`${t.chainId}-${t.address}`}>
-          <ListItemButton
-            selected={t.address === fromToken?.address}
-            onClick={() => onClickTokenItem(t)}
-          >
-            <ListItemIcon>
-              <Avatar
-                alt={t.name}
-                src={uriToHttp(t.logoURI)[0]}
-              />
-            </ListItemIcon>
-            <ListItemText primary={t.name} secondary={t.symbol} />
-          </ListItemButton>
-        </List>
-      ))}
+      <Box sx={{ maxHeight: '400px' }}>
+        {tokensForChain.map((t) => (
+          <List component="nav" aria-label="main mailbox folders" key={`${t.chainId}-${t.address}`}>
+            <ListItemButton
+              selected={isTokenSelected(t)}
+              onClick={() => onClickTokenItem(t)}
+            >
+              <ListItemIcon>
+                <Avatar
+                  alt={t.name}
+                  src={uriToHttp(t.logoURI)[0]}
+                />
+              </ListItemIcon>
+              <ListItemText primary={t.name} secondary={t.symbol} />
+            </ListItemButton>
+          </List>
+        ))}
+      </Box>
     </Box>
   );
 
