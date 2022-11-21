@@ -16,16 +16,15 @@ const TokenInput: React.FC<ITokenInputProps> = ({
   styles = {},
 }) => {
   const theme = useTheme();
-  const appContext = useAppContext();
 
-  const { showTokenSelectionDialog } = appContext;
+  const { showTokenSelectionDialog, fromToken, toToken } = useAppContext();
 
   const onClickSelectToken = () => {
     console.log('click');
     showTokenSelectionDialog(true, position);
   };
 
-  const getToken = () => appContext.swap[position];
+  const getToken = () => (position === 'from' ? fromToken : toToken);
 
   return (
     <Box

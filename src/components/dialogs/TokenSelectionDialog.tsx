@@ -1,16 +1,52 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useNetwork } from 'wagmi';
+
+import {
+  Box, List, ListItemButton, ListItemIcon, ListItemText, Avatar,
+} from '@mui/material';
+
 import useAppContext from '../../lib/hooks/useAppContext';
 import BasicDialog from './BasicDialog';
+import { TokenType } from '../../types';
+import uriToHttp from '../../lib/utils/uriToHttp';
 
 const TokenSelectionDialog: React.FC = () => {
-  const appContext = useAppContext();
-  const { tokenSelectionDialog, closeTokenSelectionDialog } = appContext;
+  const {
+    tokenSelectionDialog, closeTokenSelectionDialog, tokens, setFromToken, setToToken, fromToken,
+  } = useAppContext();
   const { open } = tokenSelectionDialog;
+  const { chain } = useNetwork();
+
+  const tokensForChain = useMemo(() => tokens.filter((t) => t.chainId === chain?.id) || [], [tokens, chain]);
+
+  const onClickTokenItem = (token: TokenType) => {
+    if (tokenSelectionDialog.position === 'from') {
+      setFromToken(token);
+    } else if (tokenSelectionDialog.position === 'to') {
+      setToToken(token);
+    }
+    closeTokenSelectionDialog();
+  };
 
   const renderDlgContent = () => (
-    <div>
-      <h1>Token Selection Dialog</h1>
-    </div>
+    <Box>
+      {tokensForChain.map((t) => (
+        <List component="nav" aria-label="main mailbox folders" key={`${t.chainId}-${t.address}`}>
+          <ListItemButton
+            selected={t.address === fromToken?.address}
+            onClick={() => onClickTokenItem(t)}
+          >
+            <ListItemIcon>
+              <Avatar
+                alt={t.name}
+                src={uriToHttp(t.logoURI)[0]}
+              />
+            </ListItemIcon>
+            <ListItemText primary={t.name} secondary={t.symbol} />
+          </ListItemButton>
+        </List>
+      ))}
+    </Box>
   );
 
   return (

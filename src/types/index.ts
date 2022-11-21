@@ -6,3 +6,5 @@ export type TokenType = {
   'logoURI': string,
   'address': string,
 };
+
+export type SupportedChainIds = [1, 5];
