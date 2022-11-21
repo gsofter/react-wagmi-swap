@@ -1,9 +1,10 @@
 import React from 'react';
 
 import {
-  Box, useTheme, Input,
+  Box, useTheme, Input, Stack,
 } from '@mui/material';
 import TokenSelectButton from './TokenSelectButton';
+import TokenBalanceInfo from './TokenBalanceInfo';
 import useAppContext from '../../lib/hooks/useAppContext';
 
 interface ITokenInputProps {
@@ -20,7 +21,6 @@ const TokenInput: React.FC<ITokenInputProps> = ({
   const { showTokenSelectionDialog, fromToken, toToken } = useAppContext();
 
   const onClickSelectToken = () => {
-    console.log('click');
     showTokenSelectionDialog(true, position);
   };
 
@@ -56,7 +56,10 @@ const TokenInput: React.FC<ITokenInputProps> = ({
         type="number"
         placeholder="0.0"
       />
-      <TokenSelectButton position={position} token={getToken()} onClick={onClickSelectToken} />
+      <Stack direction="column" spacing={1}>
+        <TokenSelectButton token={getToken()} onClick={onClickSelectToken} />
+        <TokenBalanceInfo token={getToken()} />
+      </Stack>
     </Box>
   );
 };

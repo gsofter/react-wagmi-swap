@@ -30,19 +30,19 @@ const TokenSelectionDialog: React.FC = () => {
 
   const isTokenSelected = (token: TokenType) => {
     if (tokenSelectionDialog.position === 'from') {
-      return fromToken?.address === token.address;
+      return (fromToken?.address === token.address) && (fromToken?.native === token.native);
     }
     if (tokenSelectionDialog.position === 'to') {
-      return toToken?.address === token.address;
+      return toToken?.address === token.address && (toToken?.native === token.native);
     }
     return false;
   };
 
   const renderDlgContent = () => (
-    <Box>
+    <Box sx={{ width: '400px' }}>
       <Box sx={{ maxHeight: '400px' }}>
         {tokensForChain.map((t) => (
-          <List component="nav" aria-label="main mailbox folders" key={`${t.chainId}-${t.address}`}>
+          <List component="nav" aria-label="main mailbox folders" key={`${t.chainId}-${t.address}-${t.native ? 'native' : ''}`}>
             <ListItemButton
               selected={isTokenSelected(t)}
               onClick={() => onClickTokenItem(t)}

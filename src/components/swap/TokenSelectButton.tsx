@@ -6,7 +6,6 @@ import { TokenType } from '../../types';
 import uriToHttp from '../../lib/utils/uriToHttp';
 
 interface ITokenSelectButtonProps {
-  position: 'from' | 'to';
   token: TokenType | null;
   onClick: () => void;
 }
@@ -25,8 +24,6 @@ const TokenAvatar = ({ token }: { token: TokenType }) => (
 );
 
 const TokenSelectButton: React.FC<ITokenSelectButtonProps> = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  position,
   token,
   onClick,
 }) => {

@@ -27,6 +27,7 @@ const defaultValues = {
     decimals: 18,
     chainId: 5,
     logoURI: 'ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg',
+    native: false,
   },
   toToken: null,
 
@@ -68,6 +69,22 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
     });
   };
 
+  const handleSetFromToken = (token: TokenType) => {
+    // check if token is selected as toToken
+    if (toToken?.address === token.address && toToken?.native === token.native) { setToToken(fromToken); }
+    setFromToken(token);
+  };
+
+  const handleSetToToken = (token: TokenType) => {
+    // check if token is selected as fromToken
+    console.log('handleSetToToken', token);
+    if (fromToken?.address === token.address && fromToken?.native === token.native) {
+      console.log('toToken', toToken);
+      setFromToken(toToken);
+    }
+    setToToken(token);
+  };
+
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <AppContext.Provider value={{
@@ -78,8 +95,8 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
       showTokenSelectionDialog,
       closeTokenSelectionDialog,
       setTokens,
-      setFromToken,
-      setToToken,
+      setFromToken: handleSetFromToken,
+      setToToken: handleSetToToken,
     }}
     >
       {children}

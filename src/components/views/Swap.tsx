@@ -33,7 +33,7 @@ const SwapCard: React.FC = () => {
 
   useEffect(() => {
     initializeTokens();
-  }, []);
+  }, [chain?.id]);
 
   return (
     <Container maxWidth="sm">

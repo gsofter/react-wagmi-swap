@@ -13,6 +13,7 @@ export const getNativeToken = (chainId: number) => {
     decimals: nativeCurrency.decimals || 18,
     logoURI: NATIVE_ETH_LOGO,
     address: WETH9[chainId].address || '',
+    native: true,
   };
   return nativeToken;
 };
