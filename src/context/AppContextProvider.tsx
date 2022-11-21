@@ -15,8 +15,8 @@ type AppContexType = {
   tokens: Array<TokenType>;
   setTokens: (tokens: Array<TokenType>) => void;
 
-  setFromToken: (token: TokenType) => void;
-  setToToken: (token: TokenType) => void;
+  setFromToken: (token: TokenType | null) => void;
+  setToToken: (token: TokenType | null) => void;
 };
 
 const defaultValues = {
@@ -69,17 +69,15 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
     });
   };
 
-  const handleSetFromToken = (token: TokenType) => {
+  const handleSetFromToken = (token: TokenType | null) => {
     // check if token is selected as toToken
-    if (toToken?.address === token.address && toToken?.native === token.native) { setToToken(fromToken); }
+    if (token && toToken?.address === token.address && toToken?.native === token.native) { setToToken(fromToken); }
     setFromToken(token);
   };
 
-  const handleSetToToken = (token: TokenType) => {
+  const handleSetToToken = (token: TokenType | null) => {
     // check if token is selected as fromToken
-    console.log('handleSetToToken', token);
-    if (fromToken?.address === token.address && fromToken?.native === token.native) {
-      console.log('toToken', toToken);
+    if (token && fromToken?.address === token?.address && fromToken?.native === token?.native) {
       setFromToken(toToken);
     }
     setToToken(token);

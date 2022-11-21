@@ -9,12 +9,16 @@ import useAppContext from '../../lib/hooks/useAppContext';
 
 interface ITokenInputProps {
   position: 'from' | 'to';
+  disableEditing?: boolean;
+  showBalanceInfo?: boolean;
   styles?: React.CSSProperties | undefined;
 }
 
 const TokenInput: React.FC<ITokenInputProps> = ({
   position,
   styles = {},
+  disableEditing = false,
+  showBalanceInfo = true,
 }) => {
   const theme = useTheme();
 
@@ -55,10 +59,11 @@ const TokenInput: React.FC<ITokenInputProps> = ({
         }}
         type="number"
         placeholder="0.0"
+        disabled={disableEditing}
       />
       <Stack direction="column" spacing={1}>
-        <TokenSelectButton token={getToken()} onClick={onClickSelectToken} />
-        <TokenBalanceInfo token={getToken()} />
+        <TokenSelectButton token={getToken()} onClick={!disableEditing ? onClickSelectToken : () => {}} />
+        {showBalanceInfo && <TokenBalanceInfo token={getToken()} />}
       </Stack>
     </Box>
   );

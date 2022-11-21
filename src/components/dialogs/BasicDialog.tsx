@@ -9,17 +9,29 @@ import { useTheme } from '@mui/material/styles';
 
 interface IBasicDialogProps {
   title: string | undefined;
+  okButtonTitle?: string | undefined;
+  closeButtonTitle?: string | undefined;
   content: React.ReactNode | string;
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onOk?: () => void | undefined;
 }
 
 const BasicDialog: React.FC<IBasicDialogProps> = ({
-  title, content, open, onClose,
+  title, content, open, onClose, closeButtonTitle, okButtonTitle, onOk,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+  const okTitle = okButtonTitle || 'OK';
+  const closeTitle = closeButtonTitle || 'Close';
+
+  const renderActions = () => (
+    <DialogActions>
+      {onOk !== undefined && <Button onClick={onOk}>{okTitle}</Button>}
+      {onClose !== undefined && <Button onClick={onClose} autoFocus={onOk !== undefined}>{closeTitle}</Button>}
+    </DialogActions>
+  );
   return (
 
     <Dialog
@@ -36,11 +48,7 @@ const BasicDialog: React.FC<IBasicDialogProps> = ({
       <DialogContent>
         {content}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} autoFocus>
-          Close
-        </Button>
-      </DialogActions>
+      {renderActions()}
     </Dialog>
 
   );

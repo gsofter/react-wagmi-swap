@@ -1,20 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Paper, Container, Typography, Button,
 } from '@mui/material';
 import axios from 'axios';
-import { useNetwork } from 'wagmi';
+import { useAccount, useNetwork, useSigner } from 'wagmi';
 import TokenInput from '../swap/TokenInput';
 import TokenSelectionDialog from '../dialogs/TokenSelectionDialog';
+import SwapConfirmDialog from '../dialogs/SwapConfirmDialog';
 import { UNI_LIST } from '../../constants';
 import useAppContext from '../../lib/hooks/useAppContext';
 import { getNativeToken } from '../../lib/utils/getNativeToken';
 import { TokenType } from '../../types';
+import { fetchPrice, getRouterContract, swapTokens } from '../../lib/utils/trade';
 
 const SwapCard: React.FC = () => {
-  const { setTokens } = useAppContext();
+  const {
+    setTokens, fromToken, toToken, setFromToken, setToToken,
+  } = useAppContext();
   const { chain } = useNetwork();
+  const { address, isConnected } = useAccount();
+  const { data: signer } = useSigner();
+
+  const [price, setPrice] = useState<string>('');
+  const [openSwapConfirmDlg, setOpenSwapConfirmDlg] = useState<boolean>(false);
+
   const initializeTokens = async () => {
     const response = await axios.get(UNI_LIST);
 
@@ -29,11 +39,75 @@ const SwapCard: React.FC = () => {
     // add native token to first
     tokens.unshift(getNativeToken(chainId));
     setTokens(tokens);
+    setFromToken(getNativeToken(chainId));
+    setToToken(null);
+  };
+
+  const fetchTokenPrice = async () => {
+    if (fromToken && toToken) {
+      fetchPrice({
+        from: fromToken, to: toToken, amount: 1, chainId: chain?.id || 1,
+      }).then((res) => {
+        setPrice(res);
+      });
+    }
   };
 
   useEffect(() => {
     initializeTokens();
   }, [chain?.id]);
+
+  useEffect(() => {
+    if (isConnected && fromToken && toToken) {
+      fetchTokenPrice();
+    }
+  }, [fromToken, toToken, isConnected]);
+
+  const handleClickSwap = () => {
+    // show swap confirm dialog
+    setOpenSwapConfirmDlg(true);
+  };
+
+  const renderSwapButton = () => {
+    let btnDisabled = false;
+    let btnTxt = 'Swap';
+    if (!isConnected) {
+      btnDisabled = true;
+      btnTxt = 'Connect Wallet';
+    } else if (!fromToken || !toToken) {
+      btnDisabled = true;
+      btnTxt = 'Select Tokens';
+    }
+
+    return (
+      <Button
+        variant="contained"
+        sx={{ width: '100%', mt: 2 }}
+        disabled={btnDisabled}
+        onClick={handleClickSwap}
+      >
+        {btnTxt}
+      </Button>
+    );
+  };
+
+  const renderPriceInfo = () => {
+    if (!fromToken || !toToken) {
+      return null;
+    }
+
+    return (
+      <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
+        {`1 ${fromToken.symbol} = ${price} ${toToken.symbol}`}
+      </Typography>
+    );
+  };
+
+  const onClickConfirm = () => {
+    if (!signer || !address || !fromToken || !toToken) return;
+    const routerContract = getRouterContract(chain?.id || 1, signer);
+    swapTokens(fromToken, toToken, 1, routerContract, address, signer);
+  };
 
   return (
     <Container maxWidth="sm">
@@ -43,9 +117,11 @@ const SwapCard: React.FC = () => {
         </Typography>
         <TokenInput position="from" />
         <TokenInput position="to" />
-        <Button variant="contained" sx={{ width: '100%', mt: 2 }}>Swap</Button>
+        {renderSwapButton()}
+        {renderPriceInfo()}
       </Paper>
       <TokenSelectionDialog />
+      <SwapConfirmDialog open={openSwapConfirmDlg} onClose={() => setOpenSwapConfirmDlg(false)} onOk={onClickConfirm} />
     </Container>
   );
 };
