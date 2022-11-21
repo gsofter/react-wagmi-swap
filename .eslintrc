@@ -54,6 +54,7 @@
     "react/react-in-jsx-scope": "off",
     "no-undef": "error",
     "react/button-has-type": "off",
+    "react/require-default-props": "off",
     "import/extensions": [
       "error",
       "ignorePackages",

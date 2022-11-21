@@ -11,25 +11,21 @@ interface IBasicDialogProps {
   title: string | undefined;
   content: React.ReactNode | string;
   open: boolean;
-  setOpen: (open: boolean) => void;
+  onClose: () => void;
 }
 
 const BasicDialog: React.FC<IBasicDialogProps> = ({
-  title, content, open, setOpen,
+  title, content, open, onClose,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   return (
 
     <Dialog
       fullScreen={fullScreen}
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       aria-labelledby="responsive-dialog-title"
     >
       {title && (
@@ -41,11 +37,8 @@ const BasicDialog: React.FC<IBasicDialogProps> = ({
         {content}
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleClose}>
-          Disagree
-        </Button>
-        <Button onClick={handleClose} autoFocus>
-          Agree
+        <Button onClick={onClose} autoFocus>
+          Close
         </Button>
       </DialogActions>
     </Dialog>

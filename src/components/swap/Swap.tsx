@@ -4,6 +4,7 @@ import {
   Paper, Container, Typography, Button,
 } from '@mui/material';
 import TokenInput from './TokenInput';
+import TokenSelectionDialog from '../dialogs/TokenSelectionDialog';
 
 const SwapCard: React.FC = () => (
   <Container maxWidth="sm">
@@ -15,6 +16,8 @@ const SwapCard: React.FC = () => (
       <TokenInput position="to" />
       <Button variant="contained" sx={{ width: '100%', mt: 2 }}>Swap</Button>
     </Paper>
+
+    <TokenSelectionDialog />
   </Container>
 );
 
