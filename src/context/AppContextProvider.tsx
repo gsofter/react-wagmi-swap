@@ -1,4 +1,6 @@
 import React, { createContext, useState } from 'react';
+import { useNetwork, useSigner } from 'wagmi';
+import { getAmountIn, getAmountOut, getRouterContract } from '../lib/utils/trade';
 import { TokenType } from '../types';
 
 type AppContexType = {
@@ -67,6 +69,8 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
       position,
     });
   };
+  const { chain } = useNetwork();
+  const { data: signer } = useSigner();
 
   const closeTokenSelectionDialog = () => {
     setTokenSelectionDialog({
@@ -92,6 +96,26 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
     setToToken(token);
   };
 
+  const handeSetAmountFrom = async (val: string) => {
+    setAmountFrom(val);
+    if (chain?.id === undefined || !signer) return;
+    const routerContract = getRouterContract(chain?.id, signer);
+    if (fromToken && toToken) {
+      const amountOutVal = await getAmountOut(fromToken, toToken, val, routerContract);
+      if (typeof amountOutVal === 'string') { setAmountTo(amountOutVal); }
+    }
+  };
+
+  const handleSetAmountTo = async (val: string) => {
+    setAmountTo(val);
+    if (chain?.id === undefined || !signer) return;
+    const routerContract = getRouterContract(chain?.id, signer);
+    if (fromToken && toToken) {
+      const amountInVal = await getAmountIn(fromToken, toToken, val, routerContract);
+      if (typeof amountInVal === 'string') { setAmountFrom(amountInVal); }
+    }
+  };
+
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     <AppContext.Provider value={{
@@ -106,8 +130,8 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
       setToToken: handleSetToToken,
       amountFrom,
       amountTo,
-      setAmountFrom,
-      setAmountTo,
+      setAmountFrom: handeSetAmountFrom,
+      setAmountTo: handleSetAmountTo,
     }}
     >
       {children}

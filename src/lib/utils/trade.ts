@@ -90,3 +90,41 @@ export const swapTokens = async (
     );
   }
 };
+
+export async function getAmountOut(
+  from: TokenType,
+  to: TokenType,
+  amountIn: string,
+  routerContract: Contract,
+) {
+  try {
+    const valuesOut = await routerContract.getAmountsOut(
+      ethers.utils.parseUnits(amountIn, from.decimals),
+      [from.address, to.address],
+    );
+    const amountOut = ethers.utils.formatUnits(valuesOut[1]);
+    console.log('amount out: ', amountOut);
+    return amountOut;
+  } catch {
+    return false;
+  }
+}
+
+export async function getAmountIn(
+  from: TokenType,
+  to: TokenType,
+  amountOut: string,
+  routerContract: Contract,
+) {
+  try {
+    const valuesIn = await routerContract.getAmountsIn(
+      ethers.utils.parseUnits(amountOut, to.decimals),
+      [from.address, to.address],
+    );
+    const amountIn = ethers.utils.formatUnits(valuesIn[0], from.decimals);
+    console.log('amountIn: ', amountIn);
+    return amountIn;
+  } catch {
+    return false;
+  }
+}
