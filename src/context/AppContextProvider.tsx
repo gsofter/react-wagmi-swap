@@ -2,6 +2,7 @@ import React, { createContext, useState } from 'react';
 import { useNetwork, useSigner } from 'wagmi';
 import { getAmountIn, getAmountOut, getRouterContract } from '../lib/utils/trade';
 import { TokenType } from '../types';
+import { formatAsBalance } from '../lib/utils/formats';
 
 type AppContexType = {
   fromToken: TokenType | null;
@@ -111,7 +112,7 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
     const routerContract = getRouterContract(chain?.id, signer);
     if (fromToken && toToken) {
       const amountOutVal = await getAmountOut(fromToken, toToken, val, routerContract);
-      if (typeof amountOutVal === 'string') { setAmountTo(amountOutVal); }
+      if (typeof amountOutVal === 'string') { setAmountTo(formatAsBalance(amountOutVal)); }
     }
   };
 
@@ -124,7 +125,7 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
     const routerContract = getRouterContract(chain?.id, signer);
     if (fromToken && toToken) {
       const amountInVal = await getAmountIn(fromToken, toToken, val, routerContract);
-      if (typeof amountInVal === 'string') { setAmountFrom(amountInVal); }
+      if (typeof amountInVal === 'string') { setAmountFrom(formatAsBalance(amountInVal)); }
     }
   };
 
