@@ -72,6 +72,9 @@ const SwapCard: React.FC = () => {
     } else if (fromBalanceData?.formatted && parseFloat(amountFrom) > parseFloat(fromBalanceData?.formatted)) {
       btnDisabled = true;
       btnTxt = 'Insufficient Balance';
+    } else if (parseFloat(amountFrom) <= 0) {
+      btnDisabled = true;
+      btnTxt = 'Invalid Amount';
     }
 
     return (
