@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import {
-  Paper, Container, Typography, Button, CircularProgress, Box,
+  Paper, Container, Typography, Button,
 } from '@mui/material';
 import axios from 'axios';
 import {
@@ -15,22 +15,21 @@ import { UNI_LIST } from '../../constants';
 import useAppContext from '../../lib/hooks/useAppContext';
 import { getNativeToken } from '../../lib/utils/getNativeToken';
 import { TokenType } from '../../types';
-import { fetchPrice, getRouterContract, swapTokens } from '../../lib/utils/trade';
+import { getRouterContract, swapTokens } from '../../lib/utils/trade';
 
 const SwapCard: React.FC = () => {
   const {
-    setTokens, fromToken, toToken, setFromToken, setToToken, amountFrom, setAmountFrom, setAmountTo,
+    setTokens,
+    fromToken, toToken, setFromToken, setToToken, amountFrom, setAmountFrom, setAmountTo,
+    amountTo,
   } = useAppContext();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: fromBalanceData } = useBalance({ address, ...(fromToken && !fromToken.native ? { token: `0x${fromToken?.address.slice(2)}` } : {}) });
   const { data: signer } = useSigner();
 
-  const [price, setPrice] = useState<string>('');
   const [openSwapConfirmDlg, setOpenSwapConfirmDlg] = useState<boolean>(false);
   const [openSwapProcessingDlg, setOpenSwapProcessingDlg] = useState<boolean>(false);
-
-  const [isFetchingPrice, setIsFetchingPrice] = useState<boolean>(false);
 
   const initializeTokens = async () => {
     const response = await axios.get(UNI_LIST);
@@ -52,28 +51,9 @@ const SwapCard: React.FC = () => {
     setAmountTo('0.0');
   };
 
-  const fetchTokenPrice = async () => {
-    if (fromToken && toToken) {
-      setIsFetchingPrice(true);
-      fetchPrice({
-        from: fromToken, to: toToken, amount: 1, chainId: chain?.id || 1,
-      }).then((res) => {
-        setPrice(res);
-      }).finally(() => {
-        setIsFetchingPrice(false);
-      });
-    }
-  };
-
   useEffect(() => {
     initializeTokens();
   }, [chain?.id]);
-
-  useEffect(() => {
-    if (isConnected && fromToken && toToken && chain) {
-      fetchTokenPrice();
-    }
-  }, [fromToken, toToken, isConnected, chain]);
 
   const handleClickSwap = () => {
     // show swap confirm dialog
@@ -111,20 +91,15 @@ const SwapCard: React.FC = () => {
       return null;
     }
 
-    if (isFetchingPrice) {
-      return (
-        <Box sx={{
-          display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
-        }}
-        >
-          <CircularProgress size="16px" />
-        </Box>
-      );
+    if (parseFloat(amountFrom) === 0 || parseFloat(amountTo) === 0) {
+      return null;
     }
+
+    const price = parseFloat(amountTo) / parseFloat(amountFrom);
 
     return (
       <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
-        {`1 ${fromToken.symbol} = ${price} ${toToken.symbol}`}
+        {`1 ${fromToken.symbol} = ${price.toFixed(4)} ${toToken.symbol}`}
       </Typography>
     );
   };
