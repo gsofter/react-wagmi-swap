@@ -8,6 +8,8 @@ import SwapCallsIcon from '@mui/icons-material/SwapCalls';
 import { ConnectKitButton } from 'connectkit';
 
 function Header() {
+  const LOGO_TEXT = 'BLOXSWAP';
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -28,7 +30,7 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            SWAP
+            {LOGO_TEXT}
           </Typography>
 
           <SwapCallsIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -48,7 +50,7 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            {LOGO_TEXT}
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />
