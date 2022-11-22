@@ -1,8 +1,73 @@
-# Getting Started with Create React App
+# BloxSwap
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Live Demo](https://bloxroute-swap.netlify.app/)
+![image](https://user-images.githubusercontent.com/49583931/203301772-71c78eec-2b3e-457a-8da3-60b83a4dcc1f.png)
+
+>NOTE: BloxSwap will work for Ether mainnet and Goerli testnet.
 
 ## Technical Stacks
+- Bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
+- Built with [Typescript](https://www.typescriptlang.org/)
+- [Ethers](https://docs.ethers.io/v5/)
+- [Wagmi](https://wagmi.sh/docs/getting-started/)
+- [Material UI](https://mui.com/)
+
+## Core utils function
+
+```typescript
+export const swapTokens = async (
+  from: TokenType,
+  to: TokenType,
+  amount: number | string,
+  routerContract: Contract,
+  accountAddress: string,
+  signer: ethers.Signer,
+) => {
+  const tokens = [from.address, to.address];
+  const time = Math.floor(Date.now() / 1000) + 200000;
+  const deadline = ethers.BigNumber.from(time);
+
+  const token1 = new Contract(from.address, ERC20.abi, signer);
+  const tokenDecimals = from.decimals;
+
+  const amountIn = ethers.utils.parseUnits(typeof amount === 'number' ? amount.toString() : amount, tokenDecimals);
+  const amountOut = await routerContract.callStatic.getAmountsOut(
+    amountIn,
+    tokens,
+  );
+
+  await token1.approve(routerContract.address, amountIn);
+  const wethAddress = await routerContract.WETH();
+
+  if (from.address === wethAddress) {
+    // Eth -> Token
+    await routerContract.swapExactETHForTokens(
+      amountOut[1],
+      tokens,
+      accountAddress,
+      deadline,
+      { value: amountIn },
+    );
+  } else if (to.address === wethAddress) {
+    // Token -> Eth
+    await routerContract.swapExactTokensForETH(
+      amountIn,
+      amountOut[1],
+      tokens,
+      accountAddress,
+      deadline,
+    );
+  } else {
+    await routerContract.swapExactTokensForTokens(
+      amountIn,
+      amountOut[1],
+      tokens,
+      accountAddress,
+      deadline,
+    );
+  }
+};
+```
 
 ## Available Scripts
 
