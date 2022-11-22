@@ -72,7 +72,11 @@ const TokenInput: React.FC<ITokenInputProps> = ({
         value={getInputValue()}
       />
       <Stack direction="column" spacing={1}>
-        <TokenSelectButton token={getToken()} onClick={!disableEditing ? onClickSelectToken : () => {}} />
+        <TokenSelectButton
+          token={getToken()}
+          disabled={disableEditing}
+          onClick={!disableEditing ? onClickSelectToken : () => {}}
+        />
         {showBalanceInfo && <TokenBalanceInfo token={getToken()} />}
       </Stack>
     </Box>

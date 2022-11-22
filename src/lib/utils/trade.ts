@@ -81,13 +81,15 @@ export const swapTokens = async (
       deadline,
     );
   } else {
-    await routerContract.swapExactTokensForTokens(
+    const res = await routerContract.swapExactTokensForTokens(
       amountIn,
       amountOut[1],
       tokens,
       accountAddress,
       deadline,
     );
+
+    console.log('res => ', res);
   }
 };
 

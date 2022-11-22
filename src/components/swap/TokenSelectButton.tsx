@@ -7,6 +7,7 @@ import uriToHttp from '../../lib/utils/uriToHttp';
 
 interface ITokenSelectButtonProps {
   token: TokenType | null;
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -26,6 +27,7 @@ const TokenAvatar = ({ token }: { token: TokenType }) => (
 const TokenSelectButton: React.FC<ITokenSelectButtonProps> = ({
   token,
   onClick,
+  disabled = false,
 }) => {
   if (!token) {
     return (
@@ -50,6 +52,7 @@ const TokenSelectButton: React.FC<ITokenSelectButtonProps> = ({
       startIcon={<TokenAvatar token={token} />}
       endIcon={<KeyboardArrowDownIcon />}
       onClick={onClick}
+      disabled={disabled}
     >
       {token.symbol}
     </Button>

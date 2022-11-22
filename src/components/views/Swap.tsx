@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import {
-  Paper, Container, Typography, Button,
+  Paper, Container, Typography, Button, CircularProgress, Box,
 } from '@mui/material';
 import axios from 'axios';
 import {
@@ -10,6 +10,7 @@ import {
 import TokenInput from '../swap/TokenInput';
 import TokenSelectionDialog from '../dialogs/TokenSelectionDialog';
 import SwapConfirmDialog from '../dialogs/SwapConfirmDialog';
+import SwapProgressingDialog from '../dialogs/SwapProgressingDialog';
 import { UNI_LIST } from '../../constants';
 import useAppContext from '../../lib/hooks/useAppContext';
 import { getNativeToken } from '../../lib/utils/getNativeToken';
@@ -18,7 +19,7 @@ import { fetchPrice, getRouterContract, swapTokens } from '../../lib/utils/trade
 
 const SwapCard: React.FC = () => {
   const {
-    setTokens, fromToken, toToken, setFromToken, setToToken, amountFrom,
+    setTokens, fromToken, toToken, setFromToken, setToToken, amountFrom, setAmountFrom, setAmountTo,
   } = useAppContext();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
@@ -27,6 +28,9 @@ const SwapCard: React.FC = () => {
 
   const [price, setPrice] = useState<string>('');
   const [openSwapConfirmDlg, setOpenSwapConfirmDlg] = useState<boolean>(false);
+  const [openSwapProcessingDlg, setOpenSwapProcessingDlg] = useState<boolean>(false);
+
+  const [isFetchingPrice, setIsFetchingPrice] = useState<boolean>(false);
 
   const initializeTokens = async () => {
     const response = await axios.get(UNI_LIST);
@@ -44,14 +48,19 @@ const SwapCard: React.FC = () => {
     setTokens(tokens);
     setFromToken(getNativeToken(chainId));
     setToToken(null);
+    setAmountFrom('0.0');
+    setAmountTo('0.0');
   };
 
   const fetchTokenPrice = async () => {
     if (fromToken && toToken) {
+      setIsFetchingPrice(true);
       fetchPrice({
         from: fromToken, to: toToken, amount: 1, chainId: chain?.id || 1,
       }).then((res) => {
         setPrice(res);
+      }).finally(() => {
+        setIsFetchingPrice(false);
       });
     }
   };
@@ -61,10 +70,10 @@ const SwapCard: React.FC = () => {
   }, [chain?.id]);
 
   useEffect(() => {
-    if (isConnected && fromToken && toToken) {
+    if (isConnected && fromToken && toToken && chain) {
       fetchTokenPrice();
     }
-  }, [fromToken, toToken, isConnected]);
+  }, [fromToken, toToken, isConnected, chain]);
 
   const handleClickSwap = () => {
     // show swap confirm dialog
@@ -102,6 +111,17 @@ const SwapCard: React.FC = () => {
       return null;
     }
 
+    if (isFetchingPrice) {
+      return (
+        <Box sx={{
+          display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+        }}
+        >
+          <CircularProgress size="16px" />
+        </Box>
+      );
+    }
+
     return (
       <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
         {`1 ${fromToken.symbol} = ${price} ${toToken.symbol}`}
@@ -109,10 +129,14 @@ const SwapCard: React.FC = () => {
     );
   };
 
-  const onClickConfirm = () => {
+  const onClickConfirm = async () => {
     if (!signer || !address || !fromToken || !toToken) return;
     const routerContract = getRouterContract(chain?.id || 1, signer);
-    swapTokens(fromToken, toToken, 1, routerContract, address, signer);
+
+    setOpenSwapConfirmDlg(false);
+    setOpenSwapProcessingDlg(true);
+    await swapTokens(fromToken, toToken, amountFrom, routerContract, address, signer);
+    setOpenSwapProcessingDlg(false);
   };
 
   return (
@@ -128,6 +152,7 @@ const SwapCard: React.FC = () => {
       </Paper>
       <TokenSelectionDialog />
       <SwapConfirmDialog open={openSwapConfirmDlg} onClose={() => setOpenSwapConfirmDlg(false)} onOk={onClickConfirm} />
+      <SwapProgressingDialog open={openSwapProcessingDlg} onClose={() => setOpenSwapProcessingDlg(false)} />
     </Container>
   );
 };

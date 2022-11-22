@@ -23,7 +23,7 @@ const SwapConfirmDialog: React.FC<ISwapConfirmDialogProps> = ({ open, onClose, o
 
   return (
     <BasicDialog
-      title="Select Token"
+      title="Confirm Swap"
       open={open}
       onClose={onClose}
       onOk={onOk}

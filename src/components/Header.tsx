@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Tooltip from '@mui/material/Tooltip';
 import SwapCallsIcon from '@mui/icons-material/SwapCalls';
 import { ConnectKitButton } from 'connectkit';
 
@@ -55,9 +54,7 @@ function Header() {
           <Box sx={{ flexGrow: 1 }} />
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <ConnectKitButton />
-            </Tooltip>
+            <ConnectKitButton />
           </Box>
         </Toolbar>
       </Container>

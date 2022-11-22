@@ -80,25 +80,34 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
   };
 
   const handleSetFromToken = (token: TokenType | null) => {
-    // check if token is selected as toToken
+    // check if token is selected as toToken, then exchange fromToken and toToken
     if (token && toToken?.address === token.address && toToken?.native === token.native) {
       setToToken(fromToken);
-      setFromToken(token);
+      const tmp = amountFrom;
+      setAmountFrom(amountTo);
+      setAmountTo(tmp);
     }
+
     setFromToken(token);
   };
 
   const handleSetToToken = (token: TokenType | null) => {
-    // check if token is selected as fromToken
+    // check if token is selected as fromToken, then exchange fromToken and toToken
     if (token && fromToken?.address === token?.address && fromToken?.native === token?.native) {
       setFromToken(toToken);
+      const tmp = amountFrom;
+      setAmountFrom(amountTo);
+      setAmountTo(tmp);
     }
     setToToken(token);
   };
 
   const handeSetAmountFrom = async (val: string) => {
     setAmountFrom(val);
-    if (chain?.id === undefined || !signer) return;
+    if (chain?.id === undefined || !signer) {
+      setAmountTo(defaultValues.amountTo);
+      return;
+    }
     const routerContract = getRouterContract(chain?.id, signer);
     if (fromToken && toToken) {
       const amountOutVal = await getAmountOut(fromToken, toToken, val, routerContract);
@@ -108,7 +117,10 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
 
   const handleSetAmountTo = async (val: string) => {
     setAmountTo(val);
-    if (chain?.id === undefined || !signer) return;
+    if (chain?.id === undefined || !signer) {
+      setAmountFrom(defaultValues.amountFrom);
+      return;
+    }
     const routerContract = getRouterContract(chain?.id, signer);
     if (fromToken && toToken) {
       const amountInVal = await getAmountIn(fromToken, toToken, val, routerContract);
