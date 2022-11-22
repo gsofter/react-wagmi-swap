@@ -22,13 +22,20 @@ const TokenInput: React.FC<ITokenInputProps> = ({
 }) => {
   const theme = useTheme();
 
-  const { showTokenSelectionDialog, fromToken, toToken } = useAppContext();
+  const {
+    showTokenSelectionDialog, fromToken, toToken, setAmountFrom, setAmountTo,
+  } = useAppContext();
 
   const onClickSelectToken = () => {
     showTokenSelectionDialog(true, position);
   };
 
   const getToken = () => (position === 'from' ? fromToken : toToken);
+
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const amount = e.target.value;
+    if (position === 'from') { setAmountFrom(amount); } else setAmountTo(amount);
+  };
 
   return (
     <Box
@@ -60,6 +67,7 @@ const TokenInput: React.FC<ITokenInputProps> = ({
         type="number"
         placeholder="0.0"
         disabled={disableEditing}
+        onChange={onChangeInput}
       />
       <Stack direction="column" spacing={1}>
         <TokenSelectButton token={getToken()} onClick={!disableEditing ? onClickSelectToken : () => {}} />

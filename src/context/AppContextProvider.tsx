@@ -2,10 +2,10 @@ import React, { createContext, useState } from 'react';
 import { TokenType } from '../types';
 
 type AppContexType = {
-
   fromToken: TokenType | null;
   toToken: TokenType | null;
-
+  amountFrom: string;
+  amountTo: string;
   tokenSelectionDialog: {
     open: boolean;
     position: 'from' | 'to' | null;
@@ -14,9 +14,10 @@ type AppContexType = {
   closeTokenSelectionDialog: () => void;
   tokens: Array<TokenType>;
   setTokens: (tokens: Array<TokenType>) => void;
-
   setFromToken: (token: TokenType | null) => void;
   setToToken: (token: TokenType | null) => void;
+  setAmountFrom: (amount: string) => void;
+  setAmountTo: (amount: string) => void;
 };
 
 const defaultValues = {
@@ -30,6 +31,8 @@ const defaultValues = {
     native: false,
   },
   toToken: null,
+  amountFrom: '0.0',
+  amountTo: '0.0',
 
   tokenSelectionDialog: {
     open: false,
@@ -41,6 +44,8 @@ const defaultValues = {
   setTokens: () => {},
   setFromToken: () => {},
   setToToken: () => {},
+  setAmountFrom: () => {},
+  setAmountTo: () => {},
 };
 
 export const AppContext = createContext<AppContexType>(defaultValues);
@@ -54,7 +59,8 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
   const [toToken, setToToken] = useState<TokenType | null>(defaultValues.toToken);
   const [tokenSelectionDialog, setTokenSelectionDialog] = useState<{ open: boolean, position: 'from' | 'to' | null }>(defaultValues.tokenSelectionDialog);
   const [tokens, setTokens] = useState<Array<TokenType>>(defaultValues.tokens);
-
+  const [amountFrom, setAmountFrom] = useState<string>(defaultValues.amountFrom);
+  const [amountTo, setAmountTo] = useState<string>(defaultValues.amountTo);
   const showTokenSelectionDialog = (open: boolean, position: 'from' | 'to' | null = null) => {
     setTokenSelectionDialog({
       open,
@@ -71,7 +77,10 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
 
   const handleSetFromToken = (token: TokenType | null) => {
     // check if token is selected as toToken
-    if (token && toToken?.address === token.address && toToken?.native === token.native) { setToToken(fromToken); }
+    if (token && toToken?.address === token.address && toToken?.native === token.native) {
+      setToToken(fromToken);
+      setFromToken(token);
+    }
     setFromToken(token);
   };
 
@@ -95,6 +104,10 @@ const AppContextProvider: React.FC<IAppContextProviderProps> = ({ children }) =>
       setTokens,
       setFromToken: handleSetFromToken,
       setToToken: handleSetToToken,
+      amountFrom,
+      amountTo,
+      setAmountFrom,
+      setAmountTo,
     }}
     >
       {children}

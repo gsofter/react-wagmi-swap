@@ -4,7 +4,9 @@ import {
   Paper, Container, Typography, Button,
 } from '@mui/material';
 import axios from 'axios';
-import { useAccount, useNetwork, useSigner } from 'wagmi';
+import {
+  useAccount, useNetwork, useSigner, useBalance,
+} from 'wagmi';
 import TokenInput from '../swap/TokenInput';
 import TokenSelectionDialog from '../dialogs/TokenSelectionDialog';
 import SwapConfirmDialog from '../dialogs/SwapConfirmDialog';
@@ -16,10 +18,11 @@ import { fetchPrice, getRouterContract, swapTokens } from '../../lib/utils/trade
 
 const SwapCard: React.FC = () => {
   const {
-    setTokens, fromToken, toToken, setFromToken, setToToken,
+    setTokens, fromToken, toToken, setFromToken, setToToken, amountFrom,
   } = useAppContext();
-  const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { data: fromBalanceData } = useBalance({ address, ...(fromToken && !fromToken.native ? { token: `0x${fromToken?.address.slice(2)}` } : {}) });
   const { data: signer } = useSigner();
 
   const [price, setPrice] = useState<string>('');
@@ -77,6 +80,9 @@ const SwapCard: React.FC = () => {
     } else if (!fromToken || !toToken) {
       btnDisabled = true;
       btnTxt = 'Select Tokens';
+    } else if (fromBalanceData?.formatted && parseFloat(amountFrom) > parseFloat(fromBalanceData?.formatted)) {
+      btnDisabled = true;
+      btnTxt = 'Insufficient Balance';
     }
 
     return (
